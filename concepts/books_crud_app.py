@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
 from typing import List
 
-from data import books
+from src.config import books
 
 app = FastAPI()
 
