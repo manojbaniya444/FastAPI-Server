@@ -1,7 +1,9 @@
 from pydantic import BaseModel
+import uuid
+from typing import Optional
 
 class BookSchema(BaseModel):
-    id: int
+    uid: uuid.UUID
     title: str
     author: str
     publisher: str
@@ -10,11 +12,11 @@ class BookSchema(BaseModel):
     language: str
     
 class BookUpdateModel(BaseModel):
-    title: str
-    author: str
-    publisher: str
-    page_count: int
-    language: str
+    title: Optional[str] = None
+    author: Optional[str] = None
+    publisher: Optional[str] = None
+    page_count: Optional[int] = None
+    language: Optional[str] = None
     
 class BookCreateModel(BaseModel):
     """

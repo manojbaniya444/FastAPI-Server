@@ -31,11 +31,11 @@ class BookService:
         """
         book_data_dict = book_data.model_dump()
         
-        new_book = BookCreateModel(
+        new_book = Book(
             **book_data_dict
         )
         
-        new_book.published_date = datetime.strftime(book_data["published_date"], "%Y-%m-&d")
+        # new_book.published_date = datetime.strftime(book_data.published_date, "%Y-%m-%d")
         
         session.add(new_book)
         
@@ -76,7 +76,7 @@ class BookService:
         book_to_update = await self.get_book(book_uid, session)
         
         if book_to_update is not None:
-            update_data_dict = update_data.model_dump()
+            update_data_dict = update_data.model_dump(exclude_unset=True)
             
             for k, v in update_data_dict.items():
                 setattr(book_to_update, k, v)
