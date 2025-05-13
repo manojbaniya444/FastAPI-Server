@@ -10,6 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 ${imports if imports else ""}
+# TODO: add new this
 import sqlmodel
 
 # revision identifiers, used by Alembic.

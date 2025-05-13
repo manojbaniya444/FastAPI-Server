@@ -11,7 +11,7 @@ class User(SQLModel, table=True):
             pg.UUID,
             primary_key=True,
             unique=True,
-            nullable=True,
+            nullable=False,
             default=uuid.uuid4,
             info={"description": "Unique identifier for the user account"}
         )
@@ -22,7 +22,7 @@ class User(SQLModel, table=True):
     last_name: str = Field(nullable=True)
     is_verified: bool = False
     email: str
-    password_hash: str
+    password_hash: str = Field(exclude=True)
     created_at: datetime = Field(
         sa_column=Column(
             pg.TIMESTAMP,
