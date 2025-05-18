@@ -11,6 +11,7 @@ class TokenBearer(HTTPBearer):
         creds = await super().__call__(request)
         # get the token in auth header automatically
         token = creds.credentials
+        print(token)
         token_data = self.token_valid(token)
         if not token_data:
             raise HTTPException(
@@ -21,11 +22,14 @@ class TokenBearer(HTTPBearer):
                 }
             )
             
+        self.verify_token_data(token_data)
+        
         return token_data
     
     def token_valid(self, token: str) -> bool | dict:
         token_data = decode_token(token)
-        False if not token_data else token_data
+
+        return False if not token_data else token_data
         
     def verify_token_data(self, token_data):
         raise NotImplementedError("Please override this method in inherit class.")

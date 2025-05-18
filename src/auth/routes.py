@@ -11,7 +11,7 @@ from .schemas import UserCreateModel, UserModel
 from .service import UserService
 from src.db.main import get_session
 from .utils import create_access_token, verify_password
-from src.config import Settings
+from src.config import Config 
 from .dependencies import RefreshTokenBearer
 
 auth_router = APIRouter()
@@ -66,7 +66,7 @@ async def login_users(
     refresh_token = create_access_token(
         user_data={"email": user.email, "user_uid": str(user.uid)},
         refresh=True,
-        expiry=timedelta(days=Settings.REFRESH_TOKEN_EXPIRY)
+        expiry=timedelta(days=Config.REFRESH_TOKEN_EXPIRY)
     )
             
     return JSONResponse(
