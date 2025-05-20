@@ -10,9 +10,10 @@ from pydantic import BaseModel, Field
 from .schemas import UserCreateModel, UserModel
 from .service import UserService
 from src.db.main import get_session
+from src.db.redis import add_jti_to_blocklist
 from .utils import create_access_token, verify_password
 from src.config import Config 
-from .dependencies import RefreshTokenBearer
+from .dependencies import RefreshTokenBearer, AccessTokenBearer
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -98,4 +99,17 @@ async def get_new_access_token(
         
     raise HTTPException(
         status=status.HTTP_400_BAD_REQUEST, detail="Invalid or Expired Refresh Token Login."
+    )
+    
+@auth_router.get("/logout")
+async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
+    jti = token_details["jti"]
+    
+    await add_jti_to_blocklist(jti=jti)
+    
+    return JSONResponse(
+        content={
+            "message": "Logged out successfully."
+        },
+        status_code=status.HTTP_200_OK
     )
