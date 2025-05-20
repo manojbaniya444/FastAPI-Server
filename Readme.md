@@ -32,10 +32,13 @@ All the logic for getting, updating, deleting and inserting book in our database
 ## Dependency Injection
 
 Dependency Injection in FastAPI allows for the sharing of state among multiple API routes by providing a mechanism to create Python objects, referred to as dependencies, and accessing them only when necessary within dependant method.
+
 - Aysnc Session Dependency
 - Auth Dependency
 
 ## Database Migration with Alembic (SQLModel, SQL Alchemy)
+
+- [Alembic Setup](./migrations/)
 
 Initialize migration
 `alembic init -t async migrations`
