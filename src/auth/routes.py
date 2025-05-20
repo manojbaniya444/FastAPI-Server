@@ -13,10 +13,11 @@ from src.db.main import get_session
 from src.db.redis import add_jti_to_blocklist
 from .utils import create_access_token, verify_password
 from src.config import Config 
-from .dependencies import RefreshTokenBearer, AccessTokenBearer
+from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user, RoleChecker
 
 auth_router = APIRouter()
 user_service = UserService()
+role_checker_admin = RoleChecker(["admin"])
 
 class UserLoginModel(BaseModel):
     email: str = Field(max_length=40)
@@ -81,6 +82,10 @@ async def login_users(
             }
         }
     )
+    
+@auth_router.get("/me", response_model=UserModel)
+async def get_current_user(user=Depends(get_current_user), _: bool = Depends(role_checker_admin)):
+    return user
 
 @auth_router.get("/refresh_token")
 async def get_new_access_token(

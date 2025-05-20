@@ -18,3 +18,4 @@ class UserModel(BaseModel):
     email: str
     password_hash: str = Field(exclude=True)
     created_at: datetime
+    role: str

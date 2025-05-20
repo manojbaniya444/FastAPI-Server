@@ -9,15 +9,19 @@ from src.books.service import BookService
 from src.db.main import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.auth.dependencies import AccessTokenBearer
+from src.auth.dependencies import RoleChecker
 
 from typing import List
 
 book_router = APIRouter()
 book_service = BookService()
 access_token_bearer = AccessTokenBearer()
+role_checker_admin = Depends(RoleChecker(["admin"]))
+role_checker_user = Depends(RoleChecker(["user"]))
 
 # Returns all the books (GET)
-@book_router.get("/books", response_model=List[BookSchema])
+# Set the dependencies in the http call
+@book_router.get("/books", response_model=List[BookSchema], dependencies=[role_checker_user])
 async def get_all_books(
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer)
@@ -26,7 +30,7 @@ async def get_all_books(
     return books
 
 # Post a new book (POST)
-@book_router.post("/books", status_code=status.HTTP_201_CREATED)
+@book_router.post("/books", status_code=status.HTTP_201_CREATED,  dependencies = [role_checker_admin])
 async def create_a_book(
     book_data: BookCreateModel,
     session: AsyncSession = Depends(get_session),
@@ -37,7 +41,7 @@ async def create_a_book(
     return new_book.model_dump()
 
 # Return a single book (GET)
-@book_router.get("/book/{book_uuid}")
+@book_router.get("/book/{book_uuid}", dependencies = [role_checker_user])
 async def get_book(
     book_uuid: str,
     session: AsyncSession = Depends(get_session),
@@ -52,12 +56,12 @@ async def get_book(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book with given id not found hai")
 
 # Update a book (PATCH)
-@book_router.patch("/book/{book_uuid}")
+@book_router.patch("/book/{book_uuid}", dependencies=[role_checker_admin])
 async def update_book(
     book_uuid: str,
     book_data: BookUpdateModel,
     session: AsyncSession = Depends(get_session),
-    token_details = Depends(access_token_bearer)
+    token_details = Depends(access_token_bearer),
 ):
     updated_book = await book_service.update_book(book_uuid, book_data, session)
         
@@ -71,7 +75,8 @@ async def update_book(
 async def delete_a_book(
     book_uuid: str,
     session: AsyncSession = Depends(get_session),
-    token_details = Depends(access_token_bearer)
+    token_details = Depends(access_token_bearer),
+    _: bool = Depends(RoleChecker(["admin"])) # checks the role to be admin to delete the book from the database
 ):
     book_to_delete = await book_service.delete_book(book_uuid, session)
     
