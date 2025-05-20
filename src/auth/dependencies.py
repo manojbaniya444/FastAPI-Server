@@ -15,14 +15,6 @@ class TokenBearer(HTTPBearer):
 
         token_data = self.token_valid(token)
         
-        if await token_in_blocklist(token_data["jti"]):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "error": "This token is invalid or has been revoked.",
-                    "resolution": "Please login again."
-                }
-            )
         
         if not token_data:
             raise HTTPException(
@@ -30,6 +22,15 @@ class TokenBearer(HTTPBearer):
                 detail={
                     "error": "This token is invalid or expired",
                     "resolution": "Please get a new token"
+                }
+            )
+            
+        if await token_in_blocklist(token_data["jti"]):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "error": "This token is invalid or has been revoked.",
+                    "resolution": "Please login again."
                 }
             )
             

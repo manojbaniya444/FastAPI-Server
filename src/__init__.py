@@ -28,7 +28,7 @@ app = FastAPI(
 # Include the books_router here
 app.include_router(
     book_router,
-    prefix=f"/api/{version}/books",
+    prefix=f"/api/{version}",
     tags=["books"]
 )
 

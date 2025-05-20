@@ -1,4 +1,4 @@
-import aioredis
+import redis.asyncio as aioredis
 from src.config import Config
 
 # should be same as access token expiry otherwise the token might be able to access after the redis blocklist expires.
