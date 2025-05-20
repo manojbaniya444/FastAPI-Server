@@ -28,6 +28,7 @@ All the logic for getting, updating, deleting and inserting book in our database
 - [Auth Model](./src/auth/models.py)
 - [Auth Schema](./src/auth/schemas.py)
 - [API Endpoints for Auth Service](./src/auth/routes.py)
+- [Role Base Access Control to authrize](./src/auth/dependencies.py)
 
 ## Dependency Injection
 
@@ -35,6 +36,7 @@ Dependency Injection in FastAPI allows for the sharing of state among multiple A
 
 - Aysnc Session Dependency
 - Auth Dependency
+- Role Base Access Control Dependency to check assign role to update, delete, get method
 
 ## Database Migration with Alembic (SQLModel, SQL Alchemy)
 
