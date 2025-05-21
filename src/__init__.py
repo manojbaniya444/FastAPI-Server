@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from src.books.routes import book_router
 from src.auth.routes import auth_router
+from src.reviews.routes import review_router
 from src.db.main import initdb
 
 from contextlib import asynccontextmanager
@@ -22,7 +23,7 @@ app = FastAPI(
     title="Book API",
     description="A Backend API for book web app",
     version=version,
-    lifespan=lifespan
+    # lifespan=lifespan
 )
 
 # Include the books_router here
@@ -37,3 +38,5 @@ app.include_router(
     prefix=f"/api/{version}/auth",
     tags=["auth"]
 )
+
+app.include_router(review_router, prefix=f"/api/{version}/reviews", tags=["reviews"])
