@@ -25,7 +25,7 @@ class User(SQLModel, table=True):
     )
     is_verified: bool = False
     email: str
-    password_hash: str = Field(exclude=True) # This will exclude the field when in return
+    password_hash: str = Field(exclude=True, min_length=5) # This will exclude the field when in return
     created_at: datetime = Field(
         sa_column=Column(
             pg.TIMESTAMP,

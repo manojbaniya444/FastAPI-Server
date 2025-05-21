@@ -17,7 +17,7 @@ book_router = APIRouter()
 book_service = BookService()
 access_token_bearer = AccessTokenBearer()
 role_checker_admin = Depends(RoleChecker(["admin"]))
-role_checker_user = Depends(RoleChecker(["user"]))
+role_checker_user = Depends(RoleChecker(["user","admin"]))
 
 # Returns all the books (GET)
 # Set the dependencies in the http call
@@ -36,7 +36,8 @@ async def create_a_book(
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer)
 ) -> dict:
-    new_book = await book_service.create_book(book_data, session)
+    user_id = token_details.get("user")["user_uid"]
+    new_book = await book_service.create_book(book_data, user_uid=user_id, session=session)
     # TODO: Any nice to do here why?
     return new_book.model_dump()
 

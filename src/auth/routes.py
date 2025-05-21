@@ -18,10 +18,10 @@ from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_use
 auth_router = APIRouter()
 user_service = UserService()
 role_checker_admin = RoleChecker(["admin"])
-
+role_checker_user = RoleChecker(["user"])
 class UserLoginModel(BaseModel):
     email: str = Field(max_length=40)
-    password: str = Field(min_length=6)
+    password: str = Field(min_length=5)
 
 @auth_router.post("/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED)
 async def create_user_account(

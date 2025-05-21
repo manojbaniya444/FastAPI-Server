@@ -19,7 +19,7 @@ class BookService:
         result = await session.exec(statement)
         return result.all()
     
-    async def create_book(self, book_data: BookCreateModel, session: AsyncSession):
+    async def create_book(self, book_data: BookCreateModel, user_uid: str, session: AsyncSession):
         """
         Create a new book
         
@@ -31,17 +31,32 @@ class BookService:
         """
         book_data_dict = book_data.model_dump()
         
+        # new_book.published_date = datetime.strftime(book_data.published_date, "%Y-%m-%d") 
+        # get this type of date: "2020-01-05"
+        
         new_book = Book(
             **book_data_dict
         )
         
-        # new_book.published_date = datetime.strftime(book_data.published_date, "%Y-%m-%d")
+        new_book.user_uid = user_uid
         
         session.add(new_book)
         
         await session.commit()
         
         return new_book
+    
+    async def get_user_books(self, user_uid: str, session: AsyncSession):
+        # get the book with user_uid equal to the user_uid provided match (get books of user)
+        statement = (
+            sqlmodel.select(Book)
+            .where(Book.user_uid == user_uid)
+            .order_by(sqlmodel.desc(Book.created_at))
+        )
+        
+        result = await session.exec(statement)
+        
+        return result.all()
     
     async def get_book(self, book_uid: str, session: AsyncSession):
         """

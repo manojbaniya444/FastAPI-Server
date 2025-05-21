@@ -10,6 +10,7 @@ class BookSchema(BaseModel):
     published_date: str
     page_count: int
     language: str
+    user_uid: str
     
 class BookUpdateModel(BaseModel):
     title: Optional[str] = None
