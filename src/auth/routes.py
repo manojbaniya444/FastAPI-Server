@@ -7,7 +7,7 @@ from fastapi.exceptions import HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 from pydantic import BaseModel, Field
 
-from .schemas import UserCreateModel, UserModel
+from .schemas import UserCreateModel, UserModel, UserBooksModel
 from .service import UserService
 from src.db.main import get_session
 from src.db.redis import add_jti_to_blocklist
@@ -83,7 +83,7 @@ async def login_users(
         }
     )
     
-@auth_router.get("/me", response_model=UserModel)
+@auth_router.get("/me", response_model=UserBooksModel)
 async def get_current_user(user=Depends(get_current_user), _: bool = Depends(role_checker_admin)):
     return user
 

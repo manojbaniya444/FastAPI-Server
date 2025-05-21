@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 import uuid
 from datetime import datetime
 from enum import Enum
+from src.books.schemas import BookSchema
+from typing import List
 
 class UserRole(str, Enum):
     admin = "admin"
@@ -25,3 +27,6 @@ class UserModel(BaseModel):
     password_hash: str = Field(exclude=True)
     created_at: datetime
     role: str
+    
+class UserBooksModel(UserModel):
+    books: List[BookSchema]
