@@ -21,7 +21,7 @@ role_checker_user = Depends(RoleChecker(["user","admin"]))
 
 # Returns all the books (GET)
 # Set the dependencies in the http call
-@book_router.get("/books", response_model=List[BookSchema], dependencies=[role_checker_user])
+@book_router.get("/", response_model=List[BookSchema], dependencies=[role_checker_user])
 async def get_all_books(
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer)
@@ -30,7 +30,7 @@ async def get_all_books(
     return books
 
 # Post a new book (POST)
-@book_router.post("/books", status_code=status.HTTP_201_CREATED,  dependencies = [role_checker_admin])
+@book_router.post("/", status_code=status.HTTP_201_CREATED,  dependencies = [role_checker_admin])
 async def create_a_book(
     book_data: BookCreateModel,
     session: AsyncSession = Depends(get_session),
@@ -42,7 +42,7 @@ async def create_a_book(
     return new_book.model_dump()
 
 # Return a single book (GET)
-@book_router.get("/book/{book_uuid}", dependencies = [role_checker_user])
+@book_router.get("/{book_uuid}", dependencies = [role_checker_user])
 async def get_book(
     book_uuid: str,
     session: AsyncSession = Depends(get_session),
@@ -57,7 +57,7 @@ async def get_book(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book with given id not found hai")
 
 # Update a book (PATCH)
-@book_router.patch("/book/{book_uuid}", dependencies=[role_checker_admin])
+@book_router.patch("/{book_uuid}", dependencies=[role_checker_admin])
 async def update_book(
     book_uuid: str,
     book_data: BookUpdateModel,
@@ -72,7 +72,7 @@ async def update_book(
         return updated_book
 
 # Delete a book in book list (DELETE)
-@book_router.delete("/book/{book_uuid}", status_code=status.HTTP_204_NO_CONTENT)
+@book_router.delete("/{book_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_a_book(
     book_uuid: str,
     session: AsyncSession = Depends(get_session),
