@@ -3,6 +3,8 @@ from src.db.models import Book
 from src.books.schemas import BookCreateModel, BookUpdateModel
 import sqlmodel
 from datetime import datetime
+import uuid
+from sqlalchemy.orm import selectinload
 
 class BookService:
     """
@@ -19,7 +21,7 @@ class BookService:
         result = await session.exec(statement)
         return result.all()
     
-    async def create_book(self, book_data: BookCreateModel, user_uid: str, session: AsyncSession):
+    async def create_book(self, book_data: BookCreateModel, user_uid: uuid.UUID, session: AsyncSession):
         """
         Create a new book
         
@@ -46,7 +48,7 @@ class BookService:
         
         return new_book
     
-    async def get_user_books(self, user_uid: str, session: AsyncSession):
+    async def get_user_books(self, user_uid: uuid.UUID, session: AsyncSession):
         # get the book with user_uid equal to the user_uid provided match (get books of user)
         statement = (
             sqlmodel.select(Book)
@@ -58,7 +60,7 @@ class BookService:
         
         return result.all()
     
-    async def get_book(self, book_uid: str, session: AsyncSession):
+    async def get_book(self, book_uid: uuid.UUID, session: AsyncSession):
         """
         Get a book by its UUID
         
@@ -68,15 +70,17 @@ class BookService:
         Returns:
             Book: the book object
         """
-        statement = sqlmodel.select(Book).where(Book.uid == book_uid)
-        
+        statement = sqlmodel.select(Book).where(Book.uid == book_uid).options(
+            selectinload(Book.reviews),
+            selectinload(Book.tags)
+        )
         result = await session.exec(statement)
         
         book = result.first()
         
         return book if book is not None else None
     
-    async def update_book(self, book_uid: str, update_data: BookUpdateModel, session: AsyncSession):
+    async def update_book(self, book_uid: uuid.UUID, update_data: BookUpdateModel, session: AsyncSession):
         """
         Update a book
         
@@ -103,7 +107,7 @@ class BookService:
         else:
             return None
         
-    async def delete_book(self, book_uuid: str, session: AsyncSession):
+    async def delete_book(self, book_uuid: uuid.UUID, session: AsyncSession):
         """
         Delete a book
         

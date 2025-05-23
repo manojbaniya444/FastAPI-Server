@@ -4,7 +4,7 @@ from src.books.routes import book_router
 from src.auth.routes import auth_router
 from src.reviews.routes import review_router
 from src.tags.routes import tag_router
-
+from src.errors import register_error_handlers
 from src.db.main import initdb
 
 from contextlib import asynccontextmanager
@@ -27,6 +27,9 @@ app = FastAPI(
     version=version,
     lifespan=lifespan
 )
+
+# register error handler here
+register_error_handlers(app)
 
 # Include the books_router here
 app.include_router(

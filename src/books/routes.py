@@ -11,6 +11,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.auth.dependencies import AccessTokenBearer
 from src.auth.dependencies import RoleChecker
 
+import uuid
+
+from src.errors import (
+    BookNotFoundException
+)
+
 from typing import List
 
 book_router = APIRouter()
@@ -44,7 +50,7 @@ async def create_a_book(
 # Return a single book (GET)
 @book_router.get("/{book_uuid}", dependencies = [role_checker_user])
 async def get_book(
-    book_uuid: str,
+    book_uuid: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer)
 ) -> dict:
@@ -54,12 +60,12 @@ async def get_book(
         # TODO: Here also
         return book.model_dump()
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book with given id not found hai")
+        raise BookNotFoundException()
 
 # Update a book (PATCH)
 @book_router.patch("/{book_uuid}", dependencies=[role_checker_admin])
 async def update_book(
-    book_uuid: str,
+    book_uuid: uuid.UUID,
     book_data: BookUpdateModel,
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer),
@@ -67,14 +73,14 @@ async def update_book(
     updated_book = await book_service.update_book(book_uuid, book_data, session)
         
     if updated_book is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book with the given id not found hai in data")
+        raise BookNotFoundException()
     else:
         return updated_book
 
 # Delete a book in book list (DELETE)
 @book_router.delete("/{book_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_a_book(
-    book_uuid: str,
+    book_uuid: uuid.UUID,
     session: AsyncSession = Depends(get_session),
     token_details = Depends(access_token_bearer),
     _: bool = Depends(RoleChecker(["admin"])) # checks the role to be admin to delete the book from the database
@@ -82,6 +88,6 @@ async def delete_a_book(
     book_to_delete = await book_service.delete_book(book_uuid, session)
     
     if book_to_delete is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+        raise BookNotFoundException()
     else:
         return {}

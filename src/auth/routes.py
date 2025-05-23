@@ -7,6 +7,14 @@ from fastapi.exceptions import HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 from pydantic import BaseModel, Field
 
+from src.errors import (
+    UserAlreadyExistsException,
+    InvalidTokenException,
+    RefreshTokenRequiredException,
+    InvalidCredentialsException
+    
+)
+
 from .schemas import UserCreateModel, UserModel, UserBooksModel
 from .service import UserService
 from src.db.main import get_session
@@ -33,7 +41,7 @@ async def create_user_account(
     user_exists = await user_service.user_exists(email, session)
     
     if user_exists:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with given email already exists")
+        raise UserAlreadyExistsException()
     
     new_user = await user_service.create_user(user_data, session)
     
@@ -50,16 +58,12 @@ async def login_users(
     user = await user_service.get_user_by_email(email, session)
     
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Email."
-        )
+        raise InvalidCredentialsException()
 
     password_valid = verify_password(password, user.password_hash)
     
     if not password_valid:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password."
-        )
+        raise InvalidCredentialsException()
         
     access_token = create_access_token(
         user_data={"email": user.email, "user_uid": str(user.uid)}
@@ -102,9 +106,7 @@ async def get_new_access_token(
             content={"access_token": new_access_token}
         )
         
-    raise HTTPException(
-        status=status.HTTP_400_BAD_REQUEST, detail="Invalid or Expired Refresh Token Login."
-    )
+    raise InvalidTokenException()
     
 @auth_router.get("/logout")
 async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):

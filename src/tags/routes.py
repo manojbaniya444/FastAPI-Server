@@ -1,4 +1,5 @@
 from typing import List
+import uuid
 
 from fastapi import APIRouter, Depends, status
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -33,7 +34,7 @@ async def add_tag(
     dependencies=[user_role_checker]
 )
 async def add_tags_to_book(
-    book_uid: str, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
+    book_uid: uuid.UUID, tag_data: TagAddModel, session: AsyncSession = Depends(get_session)
 ) -> BookSchema:
     book_with_tag = await tag_service.add_tags_to_book(
         book_uid=book_uid,
@@ -44,7 +45,7 @@ async def add_tags_to_book(
 
 @tag_router.put("/{tag_uid}", response_model=TagModel, dependencies=[user_role_checker])
 async def update_tag(
-    tag_uid: str,
+    tag_uid: uuid.UUID,
     tag_update_data: TagCreateModel,
     session: AsyncSession = Depends(get_session)
 ) -> TagModel:
@@ -53,7 +54,7 @@ async def update_tag(
 
 @tag_router.delete("/{tag_uid}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[user_role_checker])
 async def delete_tag(
-    tag_uid: str, session: AsyncSession = Depends(get_session)
+    tag_uid: uuid.UUID, session: AsyncSession = Depends(get_session)
 ) -> None:
     deleted_tag = await tag_service.delete_tag(tag_uid, session)
     return deleted_tag

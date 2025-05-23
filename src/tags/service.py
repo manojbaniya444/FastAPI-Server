@@ -3,6 +3,7 @@ from fastapi.exceptions import HTTPException
 import sqlmodel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.errors import BookNotFoundException, TagNotFoundException, TagAlreadyExistsException
 from src.books.service import BookService
 from src.db.models import Tag
 
@@ -32,10 +33,7 @@ class TagService:
         book = await book_service.get_book(book_uid=book_uid, session=session)
         
         if not book:
-            raise HTTPException(
-                status_code=404,
-                detail="Book not found"
-            )
+            raise BookNotFoundException()
             
         for tag_item in tag_data.tags:
             result = await session.exec(
@@ -68,9 +66,7 @@ class TagService:
         tag = result.first()
         
         if tag:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Tag exists"
-            )
+            raise TagAlreadyExistsException()
             
         new_tag = Tag(name=tag_data.name)
         session.add(new_tag)
@@ -100,9 +96,7 @@ class TagService:
         tag = await self.get_tag_by_uid(tag_uid,session)
 
         if not tag:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag does not exist"
-            )
+            raise TagNotFoundException()
 
         await session.delete(tag)
 

@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -7,6 +9,8 @@ from src.db.models import User
 
 from .schemas import ReviewCreateModel
 from .service import ReviewService
+
+from src.errors import BookNotFoundException
 
 review_service = ReviewService()
 review_router = APIRouter()
@@ -19,18 +23,15 @@ async def get_all_reviews(session: AsyncSession = Depends(get_session)):
     return books
 
 @review_router.get("/{review_uid}", dependencies=[user_role_checker])
-async def get_review(review_uid: str, session: AsyncSession = Depends(get_session)):
+async def get_review(review_uid: uuid.UUID, session: AsyncSession = Depends(get_session)):
     book = await review_service.get_review(review_uid, session)
     if not book:
-        raise HTTPException(
-            detail="Book not found",
-            status_code=status.HTTP_404_NOT_FOUND
-        )
+        raise BookNotFoundException()
     return book
 
 @review_router.post("/book/{book_uid}", dependencies=[user_role_checker])
 async def add_review_to_books(
-    book_uid: str,
+    book_uid: uuid.UUID,
     review_data: ReviewCreateModel,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
@@ -50,7 +51,7 @@ async def add_review_to_books(
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_review(
-    review_uid: str,
+    review_uid: uuid.UUID,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
