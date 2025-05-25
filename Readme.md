@@ -50,3 +50,17 @@ Apply Migration here
 
 Use Migration
 `alembic upgrade head`
+
+## Using Middlewares
+
+Middlewares can be used for many functionalities:
+
+- **Logging**: Can modify how the server logs details of requests and responses for montiroting and debugging purposes.
+
+- **Authentication**: Can verify tokens or credentials provided by clients are valid before the request reach the server.
+
+- **Handling CORS**
+
+- **Request Modification**
+
+- **Response Modification**

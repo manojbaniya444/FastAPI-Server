@@ -6,6 +6,7 @@ from src.reviews.routes import review_router
 from src.tags.routes import tag_router
 from src.errors import register_error_handlers
 from src.db.main import initdb
+from src.middleware import register_middleware
 
 from contextlib import asynccontextmanager
 
