@@ -23,6 +23,9 @@ from .utils import create_access_token, verify_password
 from src.config import Config 
 from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user, RoleChecker
 
+from src.mail import mail, create_message
+from src.auth.schemas import EmailModel
+
 auth_router = APIRouter()
 user_service = UserService()
 role_checker_admin = RoleChecker(["admin"])
@@ -120,3 +123,20 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
         },
         status_code=status.HTTP_200_OK
     )
+    
+@auth_router.post("/send_mail")
+async def send_mail(emails: EmailModel):
+    emails_list = emails.addresses
+    
+    html = "<h1>Welcome to our FastAPI app</h1>"
+    subject = "Welcome"
+
+    message = create_message(
+        recipients=emails_list,
+        subject=subject,
+        body=html
+    )
+    
+    await mail.send_message(message)
+    
+    return {"message": "Email sent successfully."}

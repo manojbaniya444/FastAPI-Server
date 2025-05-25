@@ -30,3 +30,6 @@ class UserModel(BaseModel):
     
 class UserBooksModel(UserModel):
     books: List[BookSchema]
+    
+class EmailModel(BaseModel):
+    addresses: List[str]

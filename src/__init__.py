@@ -26,11 +26,14 @@ app = FastAPI(
     title="Book API",
     description="A Backend API for book web app",
     version=version,
-    lifespan=lifespan
+    # lifespan=lifespan
 )
 
 # register error handler here
 register_error_handlers(app)
+
+# register middleware here
+register_middleware(app)
 
 # Include the books_router here
 app.include_router(
